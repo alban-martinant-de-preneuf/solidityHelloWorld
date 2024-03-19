@@ -1,4 +1,4 @@
-// This script is useless, we use ignition instead
+// This script is useless, I now use ignition instead.
 
 async function main() {
     const [deployer] = await ethers.getSigners();
