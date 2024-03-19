@@ -3,9 +3,11 @@ async function main() {
 
     console.log("Deploying contracts with the account: ", deployer.address);
 
-    const instanceOfContract = await ethers.deployContract("paramsForConstructor");
+    const HelloWoldFactory = await ethers.getContractFactory("HelloWorld");
 
-    console.log("Contract address: ", await instanceOfContract.getAddress());
+    const helloWorld = await HelloWoldFactory.deploy("Hello World!");
+
+    console.log("Contract address: ", helloWorld.target);
 }
 
 main()
