@@ -24,18 +24,30 @@ const HelloWorld = () => {
       setMessage(message);
     }
     fetchMessage();
+    addSmartContractListener();
   }, []);
 
-  function addSmartContractListener() { //TODO: implement
-
+  function addSmartContractListener() {
+    helloWorldContract.events.UpdatedMessage({}, (error, data) => {
+      if (error) {
+        setStatus("😥 " + error.message);
+      } else {
+        console.log(data);
+        setMessage(data.returnValues['newString']);
+        setNewMessage('');
+        setStatus('🎉 Your message has been updated!');
+      }
+    });
   }
 
   function addWalletListener() { //TODO: implement
 
   }
 
-  const connectWalletPressed = async () => { //TODO: implement
-
+  const connectWalletPressed = async () => { 
+    const walletResponse = await connectWallet();
+    setStatus(walletResponse.status);
+    setWallet(walletResponse.address);
   };
 
   const onUpdatePressed = async () => { //TODO: implement
