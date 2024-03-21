@@ -1,3 +1,5 @@
+const prompt = require("prompt-sync")();
+
 const { ALCHEMY_API_KEY, SEPOLIA_PRIVATE_KEY, CONTRACT_ADDRESS } = process.env;
 
 const contract = require("../artifacts/contracts/HelloWorld.sol/HelloWorld.json");
@@ -16,8 +18,8 @@ async function main() {
 
     console.log("The message is: " + message);
 
+    const newMessage = prompt("Write the new message: ")
     console.log("updtating the message...");
-    const newMessage = "This is the new message!";
     const tx = await helloWorldContract.update(newMessage);
     await tx.wait();
 
