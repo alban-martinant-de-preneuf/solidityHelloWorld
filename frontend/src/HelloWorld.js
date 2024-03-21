@@ -19,23 +19,27 @@ const HelloWorld = () => {
 
   //called only once
   useEffect(async () => {
-    
+    async function fetchMessage() {
+      const message = await loadCurrentMessage();
+      setMessage(message);
+    }
+    fetchMessage();
   }, []);
 
   function addSmartContractListener() { //TODO: implement
-    
+
   }
 
   function addWalletListener() { //TODO: implement
-    
+
   }
 
   const connectWalletPressed = async () => { //TODO: implement
-    
+
   };
 
   const onUpdatePressed = async () => { //TODO: implement
-    
+
   };
 
   //the UI of our component
