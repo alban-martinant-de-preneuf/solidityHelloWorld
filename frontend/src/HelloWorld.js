@@ -25,6 +25,14 @@ const HelloWorld = () => {
     }
     fetchMessage();
     addSmartContractListener();
+
+    async function fetchWallets() {
+      const { address, status } = await getCurrentWalletConnected();
+      setWallet(address);
+      setStatus(status);
+    }
+    fetchWallets();
+    addWalletListener();
   }, []);
 
   function addSmartContractListener() {
@@ -41,13 +49,34 @@ const HelloWorld = () => {
   }
 
   function addWalletListener() { //TODO: implement
-
+    if (window.ethereum) {
+      window.ethereum.on("accountsChanged", (accounts) => {
+        if (accounts.length > 0) {
+          setWallet(accounts[0]);
+          setStatus("👆🏽 Write a message in the text-field above.");
+        } else {
+          setWallet("");
+          setStatus("🦊 Connect to Metamask using the top right button.");
+        }
+      });
+    } else {
+      setStatus(
+        <p>
+          {" "}
+          🦊{" "}
+          <a target="_blank" href={`https://metamask.io/download`}>
+            You must install Metamask, a virtual Ethereum wallet, in your
+            browser.
+          </a>
+        </p>
+      );
+    }
   }
 
-  const connectWalletPressed = async () => { 
+  const connectWalletPressed = async () => {
     const walletResponse = await connectWallet();
-    setStatus(walletResponse.status);
     setWallet(walletResponse.address);
+    setStatus(walletResponse.status);
   };
 
   const onUpdatePressed = async () => { //TODO: implement
