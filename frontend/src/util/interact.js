@@ -1,7 +1,7 @@
 // require('dotenv').config()
 const {
-    REACT_APP_ALCHEMY_API_KEY,
-    REACT_APP_CONTRACT_ADDRESS
+  REACT_APP_ALCHEMY_API_KEY,
+  REACT_APP_CONTRACT_ADDRESS
 } = process.env;
 
 const alchemyKey = `wss://eth-sepolia.g.alchemy.com/v2/${REACT_APP_ALCHEMY_API_KEY}`;
@@ -12,85 +12,126 @@ const contractABI = require("../contract-abi.json");
 const contractAddress = REACT_APP_CONTRACT_ADDRESS;
 
 export const helloWorldContract = new web3.eth.Contract(
-    contractABI,
-    contractAddress
+  contractABI,
+  contractAddress
 );
 
 export const loadCurrentMessage = async () => {
-    const message = await helloWorldContract.methods.message().call();
-    return message;
+  const message = await helloWorldContract.methods.message().call();
+  return message;
 };
 
 export const connectWallet = async () => {
-    if (window.ethereum) {
-        try {
-            const addressArray = await window.ethereum.request({
-                method: "eth_requestAccounts",
-            });
-            return {
-                address: addressArray[0],
-                status: "👆🏽 Write a message in the text-field above.",
-            };
-        } catch (error) {
-            return {
-                address: "",
-                status: "😥 " + error.message,
-            }
-        }
-    } else {
-        return {
-            address: "",
-            status: (
-                <span>
-                    <p>
-                        {" "}
-                        🦊{" "}
-                        <a target="_blank" href={`https://metamask.io/download`}>
-                            You must install Metamask, a virtual Ethereum wallet, in your
-                            browser.
-                        </a>
-                    </p>
-                </span>
-            ),
-        };
+  if (window.ethereum) {
+    try {
+      const addressArray = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      return {
+        address: addressArray[0],
+        status: "👆🏽 Write a message in the text-field above.",
+      };
+    } catch (error) {
+      return {
+        address: "",
+        status: "😥 " + error.message,
+      }
     }
+  } else {
+    return {
+      address: "",
+      status: (
+        <span>
+          <p>
+            {" "}
+            🦊{" "}
+            <a target="_blank" href={`https://metamask.io/download`}>
+              You must install Metamask, a virtual Ethereum wallet, in your
+              browser.
+            </a>
+          </p>
+        </span>
+      ),
+    };
+  }
 };
 
 export const getCurrentWalletConnected = async () => {
-    if (window.ethereum) {
-        try {
-            const addressArray = await window.ethereum.request({
-                method: "eth_accounts",
-            });
-            return {
-                address: addressArray[0],
-                status: "👆🏽 Write a message in the text-field above.",
-            };
-        } catch (error) {
-            return {
-                address: "",
-                status: "😥 " + error.message,
-            }
-        }
-    } else {
-        return {
-            address: "",
-            status: (
-                <span>
-                    <p>
-                        {" "}
-                        🦊{" "}
-                        <a target="_blank" href={`https://metamask.io/download`}>
-                            You must install Metamask, a virtual Ethereum wallet, in your
-                            browser.
-                        </a>
-                    </p>
-                </span>
-            ),
-        };
+  if (window.ethereum) {
+    try {
+      const addressArray = await window.ethereum.request({
+        method: "eth_accounts",
+      });
+      return {
+        address: addressArray[0],
+        status: "👆🏽 Write a message in the text-field above.",
+      };
+    } catch (error) {
+      return {
+        address: "",
+        status: "😥 " + error.message,
+      }
     }
+  } else {
+    return {
+      address: "",
+      status: (
+        <span>
+          <p>
+            {" "}
+            🦊{" "}
+            <a target="_blank" href={`https://metamask.io/download`}>
+              You must install Metamask, a virtual Ethereum wallet, in your
+              browser.
+            </a>
+          </p>
+        </span>
+      ),
+    };
+  }
 };
 
 export const updateMessage = async (address, message) => {
+  if (!window.ethereum || address === null) {
+    return {
+      status: "💡 Connect your Metamask wallet to update the message on the blockchain.",
+    };
+  }
+  if (message.trim() === "") {
+    return {
+      status: "❌ Your message cannot be an empty string.",
+    };
+  }
 
-};
+  // set up transaction parameters
+  const transactionParameters = {
+    to: contractAddress,
+    from: address,
+    data: helloWorldContract.methods.update(message).encodeABI(),
+  };
+
+  // sign the transaction
+  try {
+    const txHash = await window.ethereum.request({
+      method: "eth_sendTransaction",
+      params: [transactionParameters],
+    });
+    return {
+      status: (
+        <span>
+          ✅{" "}
+          <a target="_blank" href={`https://sepolia.etherscan.io/tx/${txHash}`}>
+            View the status of your transaction on Etherscan!
+          </a>
+          <br />
+          ℹ️ Once the transaction is verified by the network, the message will
+          be updated automatically.
+        </span>
+      ),
+    }
+  } catch (error) {
+    return {
+      status: "😥 " + error.message,
+    }
+  };
+}

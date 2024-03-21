@@ -40,7 +40,6 @@ const HelloWorld = () => {
       if (error) {
         setStatus("😥 " + error.message);
       } else {
-        console.log(data);
         setMessage(data.returnValues['newString']);
         setNewMessage('');
         setStatus('🎉 Your message has been updated!');
@@ -79,8 +78,9 @@ const HelloWorld = () => {
     setStatus(walletResponse.status);
   };
 
-  const onUpdatePressed = async () => { //TODO: implement
-
+  const onUpdatePressed = async () => { 
+    const { status } = await updateMessage(walletAddress, newMessage);
+    setStatus(status);
   };
 
   //the UI of our component
